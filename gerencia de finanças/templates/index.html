@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Resumo Financeiro -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-bold mb-4">Resumo Financeiro</h2>
+        <div class="grid grid-cols-2 gap-4">
+            <div class="bg-blue-50 p-4 rounded">
+                <p class="text-sm text-gray-600">Total de Despesas</p>
+                <p class="text-2xl font-bold text-blue-600">R$ {{ "%.2f"|format(total_expenses) }}</p>
+            </div>
+            <div class="bg-green-50 p-4 rounded">
+                <p class="text-sm text-gray-600">Total de Assinaturas</p>
+                <p class="text-2xl font-bold text-green-600">R$ {{ "%.2f"|format(total_subscriptions) }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Adicionar Nova Despesa -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-bold mb-4">Adicionar Despesa</h2>
+        <form action="{{ url_for('add_expense') }}" method="POST">
+            <div class="grid grid-cols-1 gap-4">
+                <input type="text" name="description" placeholder="Descrição" required
+                    class="w-full p-2 border rounded">
+                <input type="number" name="amount" placeholder="Valor" step="0.01" required
+                    class="w-full p-2 border rounded">
+                <select name="category" required class="w-full p-2 border rounded">
+                    <option value="">Selecione uma categoria</option>
+                    <option value="Alimentação">Alimentação</option>
+                    <option value="Transporte">Transporte</option>
+                    <option value="Moradia">Moradia</option>
+                    <option value="Lazer">Lazer</option>
+                    <option value="Outros">Outros</option>
+                </select>
+                <button type="submit" class="bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+                    Adicionar Despesa
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Lista de Despesas -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-bold mb-4">Últimas Despesas</h2>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Data</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descrição</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categoria</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for expense in expenses %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ expense.date.strftime('%d/%m/%Y') }}</td>
+                        <td class="px-6 py-4">{{ expense.description }}</td>
+                        <td class="px-6 py-4">{{ expense.category }}</td>
+                        <td class="px-6 py-4">R$ {{ "%.2f"|format(expense.amount) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Gerenciar Assinaturas -->
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-xl font-bold mb-4">Gerenciar Assinaturas</h2>
+        <form action="{{ url_for('add_subscription') }}" method="POST" class="mb-6">
+            <div class="grid grid-cols-1 gap-4">
+                <input type="text" name="name" placeholder="Nome da Assinatura" required
+                    class="w-full p-2 border rounded">
+                <input type="number" name="amount" placeholder="Valor Mensal" step="0.01" required
+                    class="w-full p-2 border rounded">
+                <select name="billing_cycle" required class="w-full p-2 border rounded">
+                    <option value="Mensal">Mensal</option>
+                    <option value="Anual">Anual</option>
+                    <option value="Semestral">Semestral</option>
+                </select>
+                <input type="date" name="next_payment" required
+                    class="w-full p-2 border rounded">
+                <button type="submit" class="bg-green-500 text-white p-2 rounded hover:bg-green-600">
+                    Adicionar Assinatura
+                </button>
+            </div>
+        </form>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nome</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ciclo</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Próximo Pagamento</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for sub in subscriptions %}
+                    <tr>
+                        <td class="px-6 py-4">{{ sub.name }}</td>
+                        <td class="px-6 py-4">R$ {{ "%.2f"|format(sub.amount) }}</td>
+                        <td class="px-6 py-4">{{ sub.billing_cycle }}</td>
+                        <td class="px-6 py-4">{{ sub.next_payment.strftime('%d/%m/%Y') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
